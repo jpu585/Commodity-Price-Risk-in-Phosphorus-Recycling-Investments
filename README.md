@@ -1,6 +1,6 @@
 # Commodity-Price-Risk-in-Phosphorus-Recycling-Investments
 
-This repository DOI: (XXX) contains files that contribute to our supplementary materials of the Manuscript: 'Commodity Price Risk in Phosphorus Recycling Investments' by Jan-Philip R. Uhlemann, Alfons Oude Lansink, James J. Leahy, Jean-Paul Chavas, Tobias Dalhaus (The DOI of the Manuscript can be found here when published). Within this repository we provide all necessary files to comprehend procedure of code calculations. We illustrate our code for data visualization that enables reproduction of our figures. To fully replicate the results run 00_master.R in a working directory with the other files. The code was run on R version 4.4.1 successfully. 
+This repository DOI: (XXX) contains files that contribute to our supplementary materials of the Manuscript: 'Commodity Price Risk in Phosphorus Recycling Investments' by Jan-Philip R. Uhlemann, Alfons Oude Lansink, James J. Leahy, Jean-Paul Chavas, Tobias Dalhaus (The DOI of the Manuscript can be found here when published). Within this repository we provide all necessary files to comprehend procedure of code calculations. We illustrate our code for data visualization that enables reproduction of our figures. To fully replicate the results run 00_master.R in a working directory with the other files. The code was successfully run on R version 4.4.1 . 
 
 ## 00_master.R
 This file runs the code scripts.
