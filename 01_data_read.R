@@ -9,10 +9,10 @@ library(readxl)
 data <- read_excel("CMO-Historical-Data-Monthly.xlsx", sheet = "Monthly Prices")
 data1 <- read_excel("CMO-Historical-Data-Monthly.xlsx", sheet = "Monthly Indices")
 
-gas <- as.numeric(unlist(data[378:777 , 9 ]))
-dap <- as.numeric(unlist(data[378:777 , 59 ]))
-food <- as.numeric(unlist(data1[381:780 , 7 ]))
-time <- data[378:777 , 1 ]
+gas <- as.numeric(unlist(data[380:788 , 9 ]))
+dap <- as.numeric(unlist(data[380:788 , 59 ]))
+food <- as.numeric(unlist(data1[383:791 , 7 ]))
+time <- data[380:788 , 1 ]
 time <- ym(time$`World Bank Commodity Price Data (The Pink Sheet)`)
 
 yr0 <- year(time)

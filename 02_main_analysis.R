@@ -6,7 +6,8 @@ rm(list = ls())
 library(moments)
 library(vars)
 library(quantreg)# VAR models
-
+library(tseries)
+library(forecast)
 
 #load and transform data ----
 dat <- read.csv("data.csv")
@@ -18,9 +19,9 @@ dat[ ,1] <- dat[ ,1] * 1.055056 * 1.0837
 #transform Dollar/mt in EUR/mt
 dat[ ,3] <- dat[ ,3] * 1.0837
 
-nn <- nrow(dat) #number of observations
+nn <- nrow(dat)-1 #number of observations
 nL <- 4 # trim for lags
-n <- nn-3
+n <- nn-4
 
 #Create variables and lags
 
@@ -32,15 +33,25 @@ pd  <- dat[nL    :nn    ,3]#DAP
 pd1 <- dat[(nL-1):(nn-1),3]
 pd2 <- dat[(nL-2):(nn-2),3]
 pd3 <- dat[(nL-3):(nn-3),3]
-pf  <- dat[nL    :nn    ,2]#Food price index
-pf1 <- dat[(nL-1):(nn-1),2]
-pf2 <- dat[(nL-2):(nn-2),2]
-pf3 <- dat[(nL-3):(nn-3),2]
+pf  <- diff(dat[nL    :(nn+1)   ,2])#Food price index
+pf1 <- diff(dat[(nL-1):(nn),2])
+pf2 <- diff(dat[(nL-2):(nn-1),2])
+pf3 <- diff(dat[(nL-3):(nn-2),2])
 tt  <- 1:nrow(dat[nL :nn,])
 yr  <- yr[nL     :      nn]
 pgs1 <- pg1**2
 pds1 <- pd1**2
 pfs1 <- pf1**2
+
+
+#adf.test(pd, k = 3)
+#adf.test(pg, k = 3)
+
+
+pp.test(pd)
+pp.test(pg)
+pp.test(pf)
+
 
 vardat <- cbind(pg, pd, pf)
 
@@ -327,18 +338,33 @@ t.test(MRev[,3,3,3], mu = 1)
 
 # Visualization ----
 
-#Data Figure
 pdf('plots/figure_1.pdf',
     family = "serif",
     width = 8, height = 6)
-plot(yr, log(pg), lwd = 1, xlab = "year", cex.lab=1.5,cex.axis=1.5, ylab = "log price",
-     ylim = c(min(log(pd), log(pg)), max(log(pd), log(pg)) +2 ), type = "l")
-lines(yr, log(pd), lwd =1 ,lty=5)
-legend("topleft", c("Gas price", "Diammonium Phosphate price"), cex=1.8, lwd=2, 
-       lty=c(1,5))
-dev.off() # , col="blue" , col="red"  col=c("red", "blue"),
 
-pdf(file="plots/figure_3a.pdf",family = "serif", width = 8, height = 5)
+# Adjust margins to allow space for the right-side y-axis label
+par(mar = c(5, 5, 4, 5) + 0.1)
+
+# Set up the primary y-axis for gas price (pg)
+plot(yr, pg, lwd = 1, xlab = "Year", cex.lab=1.5, cex.axis=1.5,
+     ylab = "Gas", ylim = c(min(pg), max(pg) + 50), type = "l")
+
+# Add secondary y-axis for diammonium phosphate price (pd)
+par(new = TRUE)
+plot(yr, pd, lwd = 1, xaxt = "n", yaxt = "n", xlab = "", ylab = "", 
+     ylim = c(min(pd), max(pd) + 350), type = "l", lty = 5)
+
+# Add the right-side y-axis for pd
+axis(4, cex.axis=1.5)
+mtext("Diammonium Phosphate", side = 4, line = 3, cex=1.5)
+
+# Add legend
+legend("topleft", c("Gas price", "Diammonium Phosphate price"), cex=1.8, 
+       lwd=2, lty=c(1,5))
+
+dev.off()
+
+pdf(file="plots/figure_2a.pdf",family = "serif", width = 8, height = 5)
 plot(ecdf(npv/1e6),
      xlab = "",xlim =c(-2.3, -0.9), axes = F, ann = F, lty = 1  )
 box()
@@ -351,7 +377,7 @@ axis(1, at= pts, labels = paste(pts, "MM", sep = ""))
 dev.off()
 
 lim <- rbind(npv, npv_no)
-pdf(file="plots/figure_3b.pdf",family = "serif", width = 8, height = 5)
+pdf(file="plots/figure_2b.pdf",family = "serif", width = 8, height = 5)
 plot(density(npv/1e6, na.rm=T),
      xlab = "",xlim =c(-2.3, -0.9), axes = F, ann = F
      , type = "l" )
@@ -386,7 +412,7 @@ RP[3,] <- mean(npv) - (1/2 * RP[1,] * var(npv) - 1/6 * RP[1,]**2 * skewness(npv)
 pts <- seq(-1.5, -2.75, -0.25)
 
 
-pdf('plots/figure_4.pdf',
+pdf('plots/figure_3.pdf',
     family = "serif",
     width = 8, height = 6)
 plot(RP[1,], RP[3,]/1e6, type = "b", pch = 16, ylab = "Certainty Equivalent", xlab = expression("Risk aversion" ~ r[a]), main = "", ylim = range(RP[3,]/1e6), axes = F)
